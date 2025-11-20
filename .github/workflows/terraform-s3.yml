@@ -34,13 +34,14 @@ jobs:
         with:
           terraform_version: ${{ env.TF_VERSION }}
 
-      - name: Configure AWS credentials
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && secrets.AWS_ACCESS_KEY_ID != ''
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
+          
+#      - name: Configure AWS credentials
+#        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+#        uses: aws-actions/configure-aws-credentials@v4
+#        with:
+#          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#          aws-region: ${{ env.AWS_REGION }}
 
       - name: Terraform Init
         run: terraform init
@@ -52,10 +53,9 @@ jobs:
         run: terraform validate
 
       - name: Terraform Plan
-        working-directory: ./infra-s3
-        run: terraform plan -var="bucket_name=${{ env.BUCKET_NAME }}"
+        run: terraform plan -input=false -no-color -var="bucket_name=${{ env.BUCKET_NAME }}"
 
-      - name: Terraform Apply (manual)
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && secrets.AWS_ACCESS_KEY_ID != ''
-        working-directory: ./infra-s3
-        run: terraform apply -auto-approve -var="bucket_name=${{ env.BUCKET_NAME }}"
+#      - name: Terraform Apply (manual)
+#        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+#        working-directory: ./infra-s3
+#        run: terraform apply -auto-approve -var="bucket_name=${{ env.BUCKET_NAME }}"
