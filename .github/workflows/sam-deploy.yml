@@ -6,39 +6,88 @@ on:
       - main
     paths:
       - 'sam-comprehend/**'
+      - '.github/workflows/sam-deploy.yml'
   pull_request:
     branches:
       - main
     paths:
       - 'sam-comprehend/**'
+      - '.github/workflows/sam-deploy.yml'
+
+env:
+  AWS_REGION: eu-west-1
+  STACK_NAME: kanidat-15-sam-comprehend
+  S3_BUCKET: kandidat-15-data
 
 jobs:
-  deploy:
+  validate-and-build:
+    name: Validate and Build SAM Application
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.9'
+          python-version: '3.11'
 
       - name: Set up SAM CLI
         uses: aws-actions/setup-sam@v2
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: eu-west-1
+          aws-region: ${{ env.AWS_REGION }}
 
-      - name: Deploy SAM application
+      - name: SAM Validate
+        working-directory: ./sam-comprehend
+        run: sam validate
+
+      - name: SAM Build
+        working-directory: ./sam-comprehend
+        run: sam build --use-container
+
+  deploy:
+    name: Deploy to AWS
+    runs-on: ubuntu-latest
+    needs: validate-and-build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Set up SAM CLI
+        uses: aws-actions/setup-sam@v2
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: SAM Build
+        working-directory: ./sam-comprehend
+        run: sam build --use-container
+
+      - name: SAM Deploy
         working-directory: ./sam-comprehend
         run: |
           sam deploy \
-            --stack-name aialpha-sentiment-glennbech \
+            --stack-name ${{ env.STACK_NAME }} \
+            --region ${{ env.AWS_REGION }} \
+            --parameter-overrides S3BucketName=${{ env.S3_BUCKET }} \
+            --capabilities CAPABILITY_IAM \
             --no-confirm-changeset \
-            --no-fail-on-empty-changeset
+            --no-fail-on-empty-changeset \
+            --resolve-s3
