@@ -39,3 +39,10 @@ Thumbs.db
 .coverage
 htmlcov/
 .dist/
+
+# Maven / Java build artifacts
+target/
+*.class
+*.jar
+*.tfstate
+*.tfstate.backup
