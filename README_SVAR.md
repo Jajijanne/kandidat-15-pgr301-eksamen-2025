@@ -41,3 +41,4 @@ Fungerende Dockerfil: sentiment-docker/Dockerfile
 
 ### Oppgave 3 Del 2
 #### Leveranser
+- workflow fil:
