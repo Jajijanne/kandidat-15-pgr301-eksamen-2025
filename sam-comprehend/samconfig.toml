@@ -1,0 +1,13 @@
+version = 0.1
+
+[default.deploy.parameters]
+stack_name = "kanidat-15-sam-comprehend"
+resolve_s3 = true
+s3_prefix = "kanidat-15-sam-comprehend"
+region = "eu-west-1"
+capabilities = "CAPABILITY_IAM"
+parameter_overrides = "S3BucketName=\"kandidat-15-data\""
+image_repositories = []
+
+[default.global.parameters]
+region = "eu-west-1"
