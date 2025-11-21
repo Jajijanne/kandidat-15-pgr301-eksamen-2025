@@ -41,4 +41,20 @@ Fungerende Dockerfil: sentiment-docker/Dockerfile
 
 ### Oppgave 3 Del 2
 #### Leveranser
-- workflow fil:
+- workflow fil: ./github/workflows/docker-build.yml
+- Successful build: https://github.com/Jajijanne/kandidat-15-pgr301-eksamen-2025/actions/runs/19555107851
+- Container image: jajijanne/sentiment-docker:latest
+ #### Instruksjoner til sensor
+ 1. Opprett Docker Hub konto og access token
+ 2. Legg til GitHub Secrets: DOCKER_USERNAME og DOCKER_TOKEN
+ 3. Oppdater image navn i workflow
+ 4. Push til sentiment-docker/ for å trigge build
+
+ ### Oppgave 4 Del 1
+ <img  alt="image" src="media/oppgave4a.png">
+
+
+ ### Oppgave 4 Del 2
+
+
+ ### Oppgave 5
